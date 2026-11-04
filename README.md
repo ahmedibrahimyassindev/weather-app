@@ -54,6 +54,7 @@ Use `npm start` to run without Node's watch mode. If port 3000 is occupied, set 
 weather-dashboard/
 ├── public/
 │   ├── app.js
+│   ├── favicon.svg
 │   ├── index.html
 │   └── styles.css
 ├── .gitignore
