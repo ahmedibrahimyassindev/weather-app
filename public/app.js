@@ -7,6 +7,7 @@ const unitButton = $('#unit-toggle');
 let units = 'metric';
 let latestQuery = null;
 let latestData = null;
+let pendingScrollTarget = null;
 
 function setStatus(message, isError = false) {
   statusText.textContent = message;
@@ -16,7 +17,6 @@ function setStatus(message, isError = false) {
 
 async function loadWeather(query, label, locationInfo = null) {
   latestQuery = query;
-  weatherPanel.classList.add('hidden');
   setStatus(`Loading weather for ${label}…`);
   try {
     const params = new URLSearchParams({ ...query, units });
@@ -28,8 +28,10 @@ async function loadWeather(query, label, locationInfo = null) {
     render(data);
     statusText.classList.add('hidden');
     weatherPanel.classList.remove('hidden');
-    if (window.location.hash === '#charts') {
-      requestAnimationFrame(() => document.getElementById('charts')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    const targetHash = pendingScrollTarget || window.location.hash;
+    pendingScrollTarget = null;
+    if (targetHash) {
+      requestAnimationFrame(() => document.getElementById(targetHash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     }
   } catch (error) {
     setStatus(error.message, true);
@@ -150,9 +152,17 @@ if (localStorage.getItem('weather-theme') === 'light') {
 }
 
 document.querySelectorAll('.side-nav .nav-link').forEach((link) => {
-  link.addEventListener('click', () => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    history.pushState(null, '', link.hash);
     document.querySelectorAll('.side-nav .nav-link').forEach((item) => item.classList.remove('active'));
     link.classList.add('active');
+    const target = document.getElementById(link.hash.slice(1));
+    if (link.hash === '#charts' && weatherPanel.classList.contains('hidden')) {
+      pendingScrollTarget = link.hash;
+      return;
+    }
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
 
