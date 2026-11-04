@@ -1,21 +1,22 @@
 # 🌤️ Weather Dashboard
 
-A weather dashboard built with Node.js and Express. It serves a responsive browser UI and keeps OpenWeather requests and the API key on the server.
+A weather dashboard built with Node.js and Express. It serves a responsive browser UI and retrieves free weather forecasts from [Open-Meteo](https://open-meteo.com/).
 
 ## Features
 
 - Current conditions, feels-like temperature, humidity, wind, and UV index.
 - Hourly forecast and a seven-day outlook.
-- Search by city or use browser location.
-- Temperature unit switching between Celsius and Fahrenheit.
-- Temperature chart and dark/light themes.
-- Express API with input validation and readable error responses.
+- City search and browser location lookup.
+- Celsius/Fahrenheit switching, temperature chart, and dark/light themes.
+- Express API that validates input and normalizes weather responses.
 
 ## Requirements
 
-- Node.js 18 or newer (includes the built-in `fetch` API).
+- Node.js 18 or newer (includes built-in `fetch`).
 - npm.
-- An OpenWeather API key with access to **One Call API 3.0**. The seven-day forecast endpoint requires One Call 3.0 access; check the current plan and usage terms in your OpenWeather account.
+- Internet access to the Open-Meteo forecast and geocoding APIs.
+
+No API key or `.env` file is needed. Open-Meteo's free hosted service is for non-commercial use and has usage limits; see its [terms](https://open-meteo.com/en/terms) before deploying or using the service commercially. Keep the Open-Meteo attribution link in the app.
 
 ## Run locally
 
@@ -25,32 +26,25 @@ A weather dashboard built with Node.js and Express. It serves a responsive brows
    npm install
    ```
 
-2. Copy `.env.example` to `.env` and add your key:
-
-   ```env
-   OPENWEATHER_API_KEY=your_api_key_here
-   PORT=3000
-   ```
-
-3. Start the development server:
+2. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000).
+3. Open [http://localhost:3000](http://localhost:3000).
 
-Use `npm start` to run without Node's watch mode. Never put the API key in browser code or commit `.env`.
+Use `npm start` to run without Node's watch mode. If port 3000 is occupied, set another port before starting; in PowerShell run `$env:PORT=3001; npm start`.
 
 ## API endpoints
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/health` | Server health check. |
-| `GET` | `/api/weather?city=Cairo&units=metric` | Search a city and return current, hourly, and daily weather. |
+| `GET` | `/api/health` | Server health check and provider name. |
+| `GET` | `/api/weather?city=Cairo&units=metric` | Search a city, then return current, hourly, and daily weather. |
 | `GET` | `/api/weather/coordinates?lat=30.04&lon=31.24&units=metric` | Return weather for coordinates. |
 
-`units` accepts `metric` or `imperial` and defaults to `metric`. The weather endpoints return the OpenWeather One Call response with location fields; errors use `{ "error": "..." }`.
+`units` accepts `metric` or `imperial` and defaults to `metric`. Errors use `{ "error": "..." }`.
 
 ## Project structure
 
@@ -60,8 +54,8 @@ weather-dashboard/
 │   ├── app.js
 │   ├── index.html
 │   └── styles.css
-├── .env.example
 ├── .gitignore
+├── package-lock.json
 ├── package.json
 ├── README.md
 └── server.js
@@ -69,8 +63,8 @@ weather-dashboard/
 
 ## Deployment
 
-Run the Node application on a Node-compatible host and configure `OPENWEATHER_API_KEY` as a server-side environment variable. Set `PORT` if the host requires a specific port. The Express app serves the UI and API from the same process.
+Run the Node application on a Node-compatible host. Set `PORT` if the host requires a specific port. The Express app serves the UI and weather API from one process.
 
 ## License
 
-No license has been added yet.
+No project license has been added. Open-Meteo API usage is subject to [Open-Meteo's terms](https://open-meteo.com/en/terms).

@@ -37,13 +37,12 @@ function render(data) {
   if (!current) throw new Error('The weather service returned incomplete data.');
   const unit = '°';
   const speedUnit = units === 'metric' ? 'm/s' : 'mph';
-  const icon = current.weather?.[0]?.icon;
+  const icon = current.weather?.[0]?.icon || '🌤️';
   $('#place-name').textContent = [data.name || data.timezone?.split('/').pop()?.replaceAll('_', ' '), data.country].filter(Boolean).join(', ') || 'Your location';
   $('#location-caption').textContent = data.name ? `${data.name}${data.country ? `, ${data.country}` : ''}` : 'Your current location';
   $('#location-message').innerHTML = `Your current location detected!<br><strong>${escapeHtml($('#place-name').textContent)}</strong>`;
   $('#place-date').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric', timeZone: data.timezone }).format(new Date(current.dt * 1000));
-  $('#weather-icon').src = icon ? `https://openweathermap.org/img/wn/${icon}@2x.png` : '';
-  $('#weather-icon').alt = current.weather?.[0]?.description || 'Weather conditions';
+  $('#weather-icon').textContent = icon;
   $('#temperature').textContent = Math.round(current.temp);
   unitButton.textContent = units === 'metric' ? '°C' : '°F';
   $('#temperature-unit').textContent = unitButton.textContent;
@@ -51,7 +50,6 @@ function render(data) {
   $('#feels-like').textContent = `${Math.round(current.feels_like)}${unit}`;
   $('#humidity').textContent = `${current.humidity}%`;
   $('#wind').textContent = `${Math.round(current.wind_speed)} ${speedUnit}`;
-  $('#uv').textContent = current.uvi == null ? '—' : Math.round(current.uvi * 10) / 10;
   renderHourly(data.hourly || []);
   renderChart(data.hourly || [], unit);
   renderDaily(data.daily || [], unit);
@@ -61,7 +59,7 @@ function renderHourly(hours) {
   $('#hourly').innerHTML = hours.slice(0, 6).map((hour, index) => {
     const icon = hour.weather?.[0]?.icon;
     const time = index === 0 ? 'Now' : new Intl.DateTimeFormat(undefined, { hour: 'numeric', timeZone: latestData.timezone }).format(new Date(hour.dt * 1000));
-    return `<div class="hour"><time>${time}</time><img src="https://openweathermap.org/img/wn/${icon || '01d'}.png" alt="${escapeHtml(hour.weather?.[0]?.description || '')}"><strong>${Math.round(hour.temp)}°</strong><small>${Math.round(hour.pop * 100 || 0)}% rain</small></div>`;
+    return `<div class="hour"><time>${time}</time><span class="forecast-symbol" aria-label="${escapeHtml(hour.weather?.[0]?.description || '')}">${icon || '🌤️'}</span><strong>${Math.round(hour.temp)}°</strong><small>${Math.round(hour.pop * 100 || 0)}% rain</small></div>`;
   }).join('');
 }
 
@@ -85,7 +83,7 @@ function renderDaily(days, unit) {
   $('#daily').innerHTML = days.slice(0, 7).map((day, index) => {
     const icon = day.weather?.[0]?.icon || '01d';
     const name = index === 0 ? 'Today' : new Intl.DateTimeFormat(undefined, { weekday: 'short', timeZone: latestData.timezone }).format(new Date(day.dt * 1000));
-    return `<div class="day"><span>${name}</span><img src="https://openweathermap.org/img/wn/${icon}.png" alt="${escapeHtml(day.weather?.[0]?.description || '')}"><span class="muted">${Math.round(day.pop * 100 || 0)}% rain</span><span class="range"><strong>${Math.round(day.temp.max)}${unit}</strong><span class="low">${Math.round(day.temp.min)}${unit}</span></span></div>`;
+    return `<div class="day"><span>${name}</span><span class="forecast-symbol" aria-label="${escapeHtml(day.weather?.[0]?.description || '')}">${icon}</span><span class="muted">${Math.round(day.pop * 100 || 0)}% rain</span><span class="range"><strong>${Math.round(day.temp.max)}${unit}</strong><span class="low">${Math.round(day.temp.min)}${unit}</span></span></div>`;
   }).join('');
 }
 

@@ -2,7 +2,7 @@
   "name": "weather-dashboard",
   "version": "1.0.0",
   "private": true,
-  "description": "Express and Node.js weather dashboard using the OpenWeather API",
+  "description": "Express and Node.js weather dashboard using the free Open-Meteo API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,7 +12,6 @@
     "node": ">=18"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
     "express": "^4.21.2"
   }
 }
