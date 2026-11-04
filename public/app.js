@@ -35,15 +35,18 @@ async function loadWeather(query, label) {
 function render(data) {
   const current = data.current;
   if (!current) throw new Error('The weather service returned incomplete data.');
-  const unit = units === 'metric' ? '°' : '°';
+  const unit = '°';
   const speedUnit = units === 'metric' ? 'm/s' : 'mph';
   const icon = current.weather?.[0]?.icon;
   $('#place-name').textContent = [data.name || data.timezone?.split('/').pop()?.replaceAll('_', ' '), data.country].filter(Boolean).join(', ') || 'Your location';
+  $('#location-caption').textContent = data.name ? `${data.name}${data.country ? `, ${data.country}` : ''}` : 'Your current location';
+  $('#location-message').innerHTML = `Your current location detected!<br><strong>${escapeHtml($('#place-name').textContent)}</strong>`;
   $('#place-date').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric', timeZone: data.timezone }).format(new Date(current.dt * 1000));
   $('#weather-icon').src = icon ? `https://openweathermap.org/img/wn/${icon}@2x.png` : '';
   $('#weather-icon').alt = current.weather?.[0]?.description || 'Weather conditions';
   $('#temperature').textContent = Math.round(current.temp);
   unitButton.textContent = units === 'metric' ? '°C' : '°F';
+  $('#temperature-unit').textContent = unitButton.textContent;
   $('#condition').textContent = current.weather?.[0]?.description || 'Current conditions';
   $('#feels-like').textContent = `${Math.round(current.feels_like)}${unit}`;
   $('#humidity').textContent = `${current.humidity}%`;
@@ -55,7 +58,7 @@ function render(data) {
 }
 
 function renderHourly(hours) {
-  $('#hourly').innerHTML = hours.slice(0, 8).map((hour, index) => {
+  $('#hourly').innerHTML = hours.slice(0, 6).map((hour, index) => {
     const icon = hour.weather?.[0]?.icon;
     const time = index === 0 ? 'Now' : new Intl.DateTimeFormat(undefined, { hour: 'numeric', timeZone: latestData.timezone }).format(new Date(hour.dt * 1000));
     return `<div class="hour"><time>${time}</time><img src="https://openweathermap.org/img/wn/${icon || '01d'}.png" alt="${escapeHtml(hour.weather?.[0]?.description || '')}"><strong>${Math.round(hour.temp)}°</strong><small>${Math.round(hour.pop * 100 || 0)}% rain</small></div>`;
@@ -97,6 +100,7 @@ form.addEventListener('submit', (event) => {
 });
 
 $('#location-button').addEventListener('click', () => {
+  $('#location-message').textContent = 'Checking your location…';
   if (!navigator.geolocation) return setStatus('Location is not supported by this browser.', true);
   setStatus('Getting your location…');
   navigator.geolocation.getCurrentPosition(
@@ -106,6 +110,8 @@ $('#location-button').addEventListener('click', () => {
   );
 });
 
+$('#location-cta').addEventListener('click', () => $('#location-button').click());
+
 unitButton.addEventListener('click', () => {
   units = units === 'metric' ? 'imperial' : 'metric';
   if (latestQuery) loadWeather(latestQuery, latestQuery.city || 'your location');
@@ -114,11 +120,16 @@ unitButton.addEventListener('click', () => {
 $('#theme-toggle').addEventListener('click', (event) => {
   document.body.classList.toggle('light');
   const isLight = document.body.classList.contains('light');
-  event.currentTarget.textContent = isLight ? '☀' : '☾';
+  event.currentTarget.querySelector('span').textContent = isLight ? '☀' : '☾';
   localStorage.setItem('weather-theme', isLight ? 'light' : 'dark');
 });
 
 if (localStorage.getItem('weather-theme') === 'light') {
   document.body.classList.add('light');
-  $('#theme-toggle').textContent = '☀';
+  $('#theme-toggle span').textContent = '☀';
 }
+
+form.addEventListener('submit', () => {
+  $('#location-caption').textContent = input.value.trim();
+  $('#location-message').innerHTML = `Showing weather for your search.<br><strong>${escapeHtml(input.value.trim())}</strong>`;
+});
