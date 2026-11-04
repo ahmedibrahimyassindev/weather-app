@@ -11,6 +11,7 @@ The dashboard loads Alexandria, Egypt by default. Search for another city at any
 - City search and browser location lookup.
 - Celsius/Fahrenheit switching, temperature chart, and dark/light themes.
 - Express API that validates input and normalizes weather responses.
+- Installable mobile app with an offline app shell and a saved forecast when available.
 
 ## Requirements
 
@@ -36,6 +37,10 @@ No API key or `.env` file is needed. Open-Meteo's free hosted service is for non
 
 3. Open [http://localhost:3000](http://localhost:3000).
 
+## Install on a phone
+
+Deploy the app to an HTTPS address first; service workers and installation require a secure context (localhost is allowed for development). Open that HTTPS address on your phone and tap **Install app**. On iPhone/iPad, open it in Safari, tap **Share**, then **Add to Home Screen**. The app shell is cached for offline launch, and weather requests fall back to a previously cached forecast. Refreshing weather still requires internet access.
+
 Use `npm start` to run without Node's watch mode. If port 3000 is occupied, set another port before starting; in PowerShell run `$env:PORT=3001; npm start`.
 
 ## API endpoints
@@ -55,8 +60,16 @@ weather-dashboard/
 ├── public/
 │   ├── app.js
 │   ├── favicon.svg
+│   ├── icons/
+│   │   ├── icon-180.png
+│   │   ├── icon-192.png
+│   │   └── icon-512.png
 │   ├── index.html
-│   └── styles.css
+│   ├── manifest.webmanifest
+│   ├── styles.css
+│   └── sw.js
+├── scripts/
+│   └── create-pwa-icons.js
 ├── .gitignore
 ├── package-lock.json
 ├── package.json
@@ -66,7 +79,7 @@ weather-dashboard/
 
 ## Deployment
 
-Run the Node application on a Node-compatible host. Set `PORT` if the host requires a specific port. The Express app serves the UI and weather API from one process.
+Run the Node application on a Node-compatible host with HTTPS. Set `PORT` if the host requires a specific port. The Express app serves the UI, manifest, service worker, icons, and weather API from one process.
 
 ## License
 

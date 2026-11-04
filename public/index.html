@@ -4,8 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c1830">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weather">
   <title>Weather Dashboard</title>
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
@@ -35,7 +40,10 @@
           <input id="city-input" name="city" placeholder="Search city..." autocomplete="off" required>
           <button class="search-submit" type="submit" aria-label="Search">↵</button>
         </form>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme"><span>☾</span><i></i></button>
+        <div class="topbar-actions">
+          <button id="install-button" class="install-button" type="button">Install app</button>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme"><span>☾</span><i></i></button>
+        </div>
       </header>
 
       <p id="status" class="status hidden" role="status" aria-live="polite"></p>
@@ -74,5 +82,13 @@
       <footer id="about">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a></footer>
     </main>
   </div>
+  <dialog id="install-help" class="install-help">
+    <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
+    <p class="eyebrow">WEATHER DASHBOARD</p>
+    <h2>Install on your phone</h2>
+    <p><strong>Android:</strong> open the browser menu and choose <em>Install app</em> or <em>Add to Home screen</em>.</p>
+    <p><strong>iPhone:</strong> open this page in Safari, tap <em>Share</em>, then <em>Add to Home Screen</em>.</p>
+    <p class="install-note">The app needs an internet connection to refresh weather data.</p>
+  </dialog>
 </body>
 </html>

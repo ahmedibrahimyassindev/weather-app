@@ -178,3 +178,36 @@ form.addEventListener('submit', () => {
   $('#location-caption').textContent = input.value.trim();
   $('#location-message').innerHTML = `Showing weather for your search.<br><strong>${escapeHtml(input.value.trim())}</strong>`;
 });
+
+let installPrompt = null;
+const installButton = $('#install-button');
+const installHelp = $('#install-help');
+const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+if (isInstalled) installButton.hidden = true;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  installPrompt = event;
+  installButton.textContent = 'Install app';
+});
+
+installButton.addEventListener('click', async () => {
+  if (!installPrompt) {
+    if (typeof installHelp.showModal === 'function') installHelp.showModal();
+    return;
+  }
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  installButton.hidden = true;
+  installPrompt = null;
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {
+    // The site remains usable online if service workers are unavailable.
+  });
+}
