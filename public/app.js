@@ -14,7 +14,7 @@ function setStatus(message, isError = false) {
   statusText.classList.remove('hidden');
 }
 
-async function loadWeather(query, label) {
+async function loadWeather(query, label, locationInfo = null) {
   latestQuery = query;
   weatherPanel.classList.add('hidden');
   setStatus(`Loading weather for ${label}…`);
@@ -23,10 +23,14 @@ async function loadWeather(query, label) {
     const response = await fetch(`/api/weather${query.city ? '' : '/coordinates'}?${params}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Could not load weather.');
+    if (locationInfo?.name) Object.assign(data, locationInfo);
     latestData = data;
     render(data);
     statusText.classList.add('hidden');
     weatherPanel.classList.remove('hidden');
+    if (window.location.hash === '#charts') {
+      requestAnimationFrame(() => document.getElementById('charts')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
   } catch (error) {
     setStatus(error.message, true);
   }
@@ -102,9 +106,27 @@ $('#location-button').addEventListener('click', () => {
   if (!navigator.geolocation) return setStatus('Location is not supported by this browser.', true);
   setStatus('Getting your location…');
   navigator.geolocation.getCurrentPosition(
-    ({ coords }) => loadWeather({ lat: String(coords.latitude), lon: String(coords.longitude) }, 'your location'),
+    async ({ coords }) => {
+      const query = { lat: String(coords.latitude), lon: String(coords.longitude) };
+      let locationInfo = null;
+      try {
+        const reverseUrl = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
+        reverseUrl.searchParams.set('latitude', query.lat);
+        reverseUrl.searchParams.set('longitude', query.lon);
+        reverseUrl.searchParams.set('localityLanguage', 'en');
+        const response = await fetch(reverseUrl, { signal: AbortSignal.timeout(8000) });
+        if (response.ok) {
+          const place = await response.json();
+          const name = place.city || place.locality || place.principalSubdivision;
+          if (name) locationInfo = { name, country: place.countryName || '' };
+        }
+      } catch {
+        // Weather still loads by the device coordinates if the place-name lookup is unavailable.
+      }
+      loadWeather(query, locationInfo?.name || 'your location', locationInfo);
+    },
     () => setStatus('Location permission was denied or could not be determined.', true),
-    { enableHighAccuracy: false, timeout: 10000 },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 },
   );
 });
 
@@ -126,6 +148,19 @@ if (localStorage.getItem('weather-theme') === 'light') {
   document.body.classList.add('light');
   $('#theme-toggle span').textContent = '☀';
 }
+
+document.querySelectorAll('.side-nav .nav-link').forEach((link) => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('.side-nav .nav-link').forEach((item) => item.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+
+window.addEventListener('hashchange', () => {
+  document.querySelectorAll('.side-nav .nav-link').forEach((link) => {
+    link.classList.toggle('active', link.hash === window.location.hash || (!window.location.hash && link.hash === '#home'));
+  });
+});
 
 loadWeather({ city: 'Alexandria, Egypt' }, 'Alexandria, Egypt');
 
