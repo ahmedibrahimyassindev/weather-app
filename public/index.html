@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b2d">
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Weather Dashboard home"><span class="brand-icon">☀</span> Weather<span>wise</span></a>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle color theme">☾</button>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">WEATHER DASHBOARD</p>
+      <h1>Weather, at a glance.</h1>
+      <p class="subtitle">A little clarity for wherever the day takes you.</p>
+      <form id="search-form" class="search" role="search">
+        <span aria-hidden="true">⌕</span>
+        <label class="sr-only" for="city-input">Search for a city</label>
+        <input id="city-input" name="city" placeholder="Search a city..." autocomplete="off" required>
+        <button id="location-button" class="location-button" type="button" title="Use my location" aria-label="Use my location">◎</button>
+        <button class="search-button" type="submit">Search</button>
+      </form>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite">Search for a city to see its forecast.</p>
+    <section id="weather" class="weather hidden" aria-live="polite">
+      <div class="overview card">
+        <div class="place"><div><p class="eyebrow" id="today-label">CURRENT WEATHER</p><h2 id="place-name">—</h2><p id="place-date" class="muted">—</p></div><img id="weather-icon" alt="" width="100" height="100"></div>
+        <div class="temperature"><span id="temperature">—</span><button id="unit-toggle" type="button" class="unit-toggle" aria-label="Switch temperature units">°C</button></div>
+        <p id="condition" class="condition">—</p>
+        <div class="metrics">
+          <div><span>FEELS LIKE</span><strong id="feels-like">—</strong></div>
+          <div><span>HUMIDITY</span><strong id="humidity">—</strong></div>
+          <div><span>WIND</span><strong id="wind">—</strong></div>
+          <div><span>UV INDEX</span><strong id="uv">—</strong></div>
+        </div>
+      </div>
+
+      <section class="card forecast-card">
+        <div class="section-heading"><div><p class="eyebrow">THE NEXT HOURS</p><h2>Hourly forecast</h2></div><span class="muted">Temperature</span></div>
+        <div id="hourly" class="hourly"></div>
+      </section>
+
+      <div class="lower-grid">
+        <section class="card chart-card">
+          <div class="section-heading"><div><p class="eyebrow">TEMPERATURE TREND</p><h2>Today</h2></div><span class="muted">Next 24 hours</span></div>
+          <div id="chart" class="chart" role="img" aria-label="Hourly temperature chart"></div>
+        </section>
+        <section class="card forecast-card daily-card">
+          <div class="section-heading"><div><p class="eyebrow">PLAN AHEAD</p><h2>7-day forecast</h2></div></div>
+          <div id="daily" class="daily"></div>
+        </section>
+      </div>
+    </section>
+    <footer>Weather data provided by <a href="https://openweathermap.org/" target="_blank" rel="noreferrer">OpenWeather</a></footer>
+  </main>
+</body>
+</html>
