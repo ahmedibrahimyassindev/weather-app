@@ -127,6 +127,8 @@ if (localStorage.getItem('weather-theme') === 'light') {
   $('#theme-toggle span').textContent = '☀';
 }
 
+loadWeather({ city: 'Alexandria, Egypt' }, 'Alexandria, Egypt');
+
 form.addEventListener('submit', () => {
   $('#location-caption').textContent = input.value.trim();
   $('#location-message').innerHTML = `Showing weather for your search.<br><strong>${escapeHtml(input.value.trim())}</strong>`;

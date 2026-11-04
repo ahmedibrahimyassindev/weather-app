@@ -2,6 +2,8 @@
 
 A weather dashboard built with Node.js and Express. It serves a responsive browser UI and retrieves free weather forecasts from [Open-Meteo](https://open-meteo.com/).
 
+The dashboard loads Alexandria, Egypt by default. Search for another city at any time.
+
 ## Features
 
 - Current conditions, feels-like temperature, humidity, wind, and UV index.
